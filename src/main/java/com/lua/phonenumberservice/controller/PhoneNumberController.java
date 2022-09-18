@@ -28,13 +28,13 @@ import java.util.List;
 @Slf4j
 public class PhoneNumberController {
 
-    @Resource
     private PagedResourcesAssembler<PhoneNumber> pagedResourcesAssembler;
 
     PhoneNumberService phoneNumberService;
 
-    public PhoneNumberController(PhoneNumberService phoneNumberService) {
+    public PhoneNumberController(PhoneNumberService phoneNumberService, PagedResourcesAssembler<PhoneNumber> pagedResourcesAssembler) {
         this.phoneNumberService = phoneNumberService;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     @Operation(summary = "Search phone numbers")
@@ -43,8 +43,8 @@ public class PhoneNumberController {
     })
     @GetMapping(produces = "application/json")
     public PagedModel find(@ParameterObject PhoneNumberSearch search,
-                                     @ParameterObject Pageable pageable) {
-        var page = phoneNumberService.find(search,pageable);
+                           @ParameterObject Pageable pageable) {
+        var page = phoneNumberService.find(search, pageable);
         return pagedResourcesAssembler.toModel(page);
     }
 
