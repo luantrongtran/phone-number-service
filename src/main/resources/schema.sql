@@ -7,3 +7,4 @@ CREATE TABLE phone_number
 
     PRIMARY KEY (phone_no)
 );
+CREATE INDEX idx_phone_number_col_customer_no ON phone_number(customer_no);
