@@ -3,14 +3,19 @@ package com.lua.phonenumberservice.service;
 import com.lua.phonenumberservice.entity.PhoneNumber;
 import com.lua.phonenumberservice.exception.NumberAlreadyActivatedException;
 import com.lua.phonenumberservice.exception.ResourceNotFoundException;
+import com.lua.phonenumberservice.model.PhoneNumberSearch;
 import com.lua.phonenumberservice.repository.PhoneNumberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,6 +33,39 @@ class PhoneNumberServiceImplTest {
     @BeforeEach
     void setUp() {
         phoneNumberService = spy(new PhoneNumberServiceImpl(phoneNumberRepository));
+    }
+
+    @Test
+    void testFind_GivenSearchByCustomer_ThenFilterByCustomerNo() {
+        // Given
+        String validCustomNo = "12345864";
+        PhoneNumberSearch search = PhoneNumberSearch.builder().customerNo(validCustomNo).build();
+        Pageable pageable = Pageable.unpaged();
+
+        var expectedList = mock(Page.class);
+        doReturn(expectedList).when(phoneNumberRepository).findAll(any(Example.class), eq(pageable));
+
+        // When
+        var actualList = phoneNumberService.find(search, pageable);
+
+        // Then
+        assertThat(actualList).isEqualTo(expectedList);
+    }
+
+    @Test
+    void testFind_GivenNoSearchGiven_ThenReturnAll() {
+        // Given
+        PhoneNumberSearch search = PhoneNumberSearch.builder().customerNo(null).build();
+        Pageable pageable = Pageable.unpaged();
+
+        var expectedList = mock(Page.class);
+        doReturn(expectedList).when(phoneNumberRepository).findAll(pageable);
+
+        // When
+        var actualList = phoneNumberService.find(search, pageable);
+
+        // Then
+        assertThat(actualList).isEqualTo(expectedList);
     }
 
     @Test

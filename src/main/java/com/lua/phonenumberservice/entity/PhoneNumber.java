@@ -1,6 +1,7 @@
 package com.lua.phonenumberservice.entity;
 
 import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PhoneNumber {
+public class PhoneNumber extends RepresentationModel<PhoneNumber> {
     @Id
     @Column(name = "phone_no")
     String phoneNo;

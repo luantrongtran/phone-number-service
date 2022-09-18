@@ -1,37 +1,51 @@
 package com.lua.phonenumberservice.controller;
 
-import com.lua.phonenumberservice.exception.NumberAlreadyActivatedException;
-import com.lua.phonenumberservice.exception.ResourceNotFoundException;
+import com.lua.phonenumberservice.entity.PhoneNumber;
+import com.lua.phonenumberservice.model.PhoneNumberSearch;
 import com.lua.phonenumberservice.service.PhoneNumberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.activation.MimeType;
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Size;
+import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/phone-number/v1")
 @Slf4j
 public class PhoneNumberController {
 
+    @Resource
+    private PagedResourcesAssembler<PhoneNumber> pagedResourcesAssembler;
+
     PhoneNumberService phoneNumberService;
 
     public PhoneNumberController(PhoneNumberService phoneNumberService) {
         this.phoneNumberService = phoneNumberService;
+    }
+
+    @Operation(summary = "Search phone numbers")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "returns a list of phone number")
+    })
+    @GetMapping(produces = "application/json")
+    public PagedModel find(@ParameterObject PhoneNumberSearch search,
+                                     @ParameterObject Pageable pageable) {
+        var page = phoneNumberService.find(search,pageable);
+        return pagedResourcesAssembler.toModel(page);
     }
 
     @Operation(summary = "Activate a phone number")
